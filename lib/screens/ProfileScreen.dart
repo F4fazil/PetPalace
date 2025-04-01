@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -34,8 +35,10 @@ class _ProfileScreenState extends State<ProfileScreen>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _avatarScaleAnimation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    _avatarScaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_animationController);
 
     _animationController.forward();
   }
@@ -49,16 +52,18 @@ class _ProfileScreenState extends State<ProfileScreen>
   Future<void> _pickProfileImage() async {
     try {
       // Step 1: Pick an image from the gallery
-      final XFile? pickedFile =
-          await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+      );
       if (pickedFile == null) return; // User canceled the picker
 
       // Step 2: Upload the image to Firebase Storage
       File imageFile = File(pickedFile.path);
       String fileName =
           'profile_images/$uid/${DateTime.now().millisecondsSinceEpoch}.jpg';
-      Reference storageReference =
-          FirebaseStorage.instance.ref().child(fileName);
+      Reference storageReference = FirebaseStorage.instance.ref().child(
+        fileName,
+      );
       UploadTask uploadTask = storageReference.putFile(imageFile);
 
       // Wait for the upload to complete
@@ -110,11 +115,11 @@ class _ProfileScreenState extends State<ProfileScreen>
     String? namePart = email?.split('@')[0] ?? 'User';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: AppBar(
         title: const Text('Profile'),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 100, 208, 197),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
       ),
       body: LayoutBuilder(
@@ -136,61 +141,64 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildProfileHeader(String namePart, double maxWidth) {
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (context, child) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-        decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 100, 208, 197),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30),
-            bottomRight: Radius.circular(30),
-          ),
-        ),
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: _pickProfileImage,
-              child: ScaleTransition(
-                scale: _avatarScaleAnimation,
-                child: CircleAvatar(
-                  radius: maxWidth * 0.15,
-                  backgroundColor: Colors.white,
-                  child: _profileImage != null
-                      ? ClipOval(
-                          child: Image.file(
-                            _profileImage!,
-                            fit: BoxFit.cover,
-                            width: maxWidth * 0.3,
-                            height: maxWidth * 0.3,
-                          ),
-                        )
-                      : Icon(
-                          Icons.add_a_photo_outlined,
-                          size: maxWidth * 0.1,
-                          color: Colors.grey,
-                        ),
+      builder:
+          (context, child) => Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+            ),
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: _pickProfileImage,
+                  child: ScaleTransition(
+                    scale: _avatarScaleAnimation,
+                    child: CircleAvatar(
+                      radius: maxWidth * 0.15,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primaryFixed,
+                      child:
+                          _profileImage != null
+                              ? ClipOval(
+                                child: Image.file(
+                                  _profileImage!,
+                                  fit: BoxFit.cover,
+                                  width: maxWidth * 0.3,
+                                  height: maxWidth * 0.3,
+                                ),
+                              )
+                              : Icon(
+                                Icons.add_a_photo_outlined,
+                                size: maxWidth * 0.1,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 10),
+                Text(
+                  namePart,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  FirebaseAuth.instance.currentUser?.email ?? '',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            Text(
-              namePart,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              FirebaseAuth.instance.currentUser?.email ?? '',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -217,34 +225,52 @@ class _ProfileScreenState extends State<ProfileScreen>
               borderRadius: BorderRadius.circular(12),
             ),
             child: ListTile(
-              leading: Icon(item['icon'],
-                  color: const Color.fromARGB(255, 100, 208, 197)),
+              leading: Icon(
+                item['icon'],
+                color: Theme.of(context).colorScheme.primary,
+              ),
               title: Text(
                 item['title'],
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              trailing: const Icon(Icons.chevron_right,
-                  color: Color.fromARGB(255, 100, 208, 197)),
+              trailing: Icon(
+                Icons.chevron_right,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               onTap: () {
                 switch (index) {
                   case 0:
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const VetMeetingsScreen()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const VetMeetingsScreen(),
+                      ),
+                    );
                     break;
                   case 1:
                     // Navigate to Sell Your Property screen
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const MeetingsScreen()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const MeetingsScreen(),
+                      ),
+                    );
                     break;
                   case 2:
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const MyPostScreen()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const MyPostScreen(),
+                      ),
+                    );
 
                     break;
                   case 3:
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const AddVetPost()));
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const AddVetPost(),
+                      ),
+                    );
                     break;
                   case 4:
                     FirebaseAuth.instance.signOut();

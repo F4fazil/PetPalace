@@ -78,9 +78,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Color iconBc = Theme.of(context).colorScheme.onPrimary;
     final screenHeight = MediaQuery.of(context).size.height;
     final circularContainerHeight = screenHeight * 0.65;
     return Scaffold(
+      backgroundColor: iconBc,
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
@@ -93,7 +95,14 @@ class _HomeScreenState extends State<HomeScreen> {
               height: circularContainerHeight, // 35% of screen height
               width: MediaQuery.of(context).size.width, // Make it circular
               decoration: const BoxDecoration(shape: BoxShape.circle),
-              child: CustomPaint(painter: CurvedSplitPainter()),
+              child: CustomPaint(
+                painter: CurvedSplitPainter(
+                  primaryContainerColor:
+                      Theme.of(context).colorScheme.primaryContainer,
+                  tertiaryFixedVariantColor:
+                      Theme.of(context).colorScheme.onTertiaryFixedVariant,
+                ),
+              ),
             ),
           ),
 
@@ -102,6 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
             left: 27,
             child: Image.asset(
               "assets/icons/pawprint.png",
+              color: iconBc, // Your desired color
+              colorBlendMode: BlendMode.srcIn, // Preserves transparency
               height: 40,
               width: 40,
             ),
@@ -147,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: MediaQuery.of(context).size.width,
               height: 600,
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: iconBc,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(40),
                   topRight: Radius.circular(40),

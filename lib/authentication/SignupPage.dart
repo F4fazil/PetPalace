@@ -2,12 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../constant/constant.dart';
+import '../screens/homepage.dart';
 import '../widgets/Osm_dailoge.dart';
 import '../widgets/login_signup_btn.dart';
+import '../widgets/lottieLoading.dart';
 import '../widgets/textfield.dart';
 import 'LoginScreen.dart';
+import 'authBloc/authBloc.dart';
+import 'authState/authState.dart';
+import 'events/authEvent.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -33,46 +40,6 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  Future<void> signUp() async {
-    if (passwordTextController.text != confirmPasswordTextController.text) {
-      OsmDailogue(context).showSnackBar("Password does not match");
-      return;
-    }
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: emailTextController.text,
-            password: passwordTextController.text,
-          );
-      await makeUserDocument(userCredential);
-      Future.delayed(const Duration(milliseconds: 500), () {
-        OsmDailogue(context).showSnackBar("User Registered");
-      });
-      String? token = await FirebaseMessaging.instance.getToken();
-      _saveTokenToDatabase(token);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-    } on FirebaseException catch (e) {
-      OsmDailogue(context).showSnackBar(e.code);
-    }
-  }
-
-  Future<void> makeUserDocument(UserCredential? userCredential) async {
-    if (userCredential != null && userCredential.user != null) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user?.uid)
-          .set({
-            "name": nameTextController.text,
-            "userEmail": userCredential.user!.email,
-            "password": passwordTextController.text,
-            "uid": userCredential.user!.uid,
-          });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,16 +55,17 @@ class _RegisterPageState extends State<RegisterPage> {
               // Header Image
               Container(
                 height: MediaQuery.of(context).size.height * 0.33,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  borderRadius: const BorderRadius.only(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(100),
                     bottomRight: Radius.circular(10),
                   ),
-                  image: const DecorationImage(
-                    fit: BoxFit.cover,
-                    image: AssetImage("assets/splash.jpg"),
-                  ),
+                ),
+                child: Image.asset(
+                  fit: BoxFit.fitHeight,
+                  "assets/splash.png",
+                  color: Theme.of(context).colorScheme.primary,
+                  colorBlendMode: BlendMode.color,
                 ),
               ),
               // Form Section
@@ -115,7 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           const SizedBox(height: 20),
                           Text(
                             "Signup",
-                            style: TextStyle(
+                            style: GoogleFonts.quicksand(
                               color:
                                   Theme.of(
                                     context,
@@ -185,14 +153,46 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: Column(
                           children: [
                             // Signup Button
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              child: MyButton(
-                                onPressed: () async {
-                                  await signUp();
-                                },
-                                text: 'Signup',
-                              ),
+                            BlocConsumer<Authbloc, Authstate>(
+                              listener: (context, state) {
+                                if (state is Authenticated) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const HomeScreen(),
+                                    ),
+                                  );
+                                } else if (state is AuthError) {
+                                  Future.delayed(
+                                    const Duration(seconds: 0),
+                                    () {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(content: Text(state.error)),
+                                      );
+                                    },
+                                  );
+                                }
+                              },
+                              builder: (context, state) {
+                                if (state is AuthLoading) {
+                                  return const Lottieloading();
+                                }
+                                return MyButton(
+                                  onPressed: () {
+                                    context.read<Authbloc>().add(
+                                      SignupIsRequested(
+                                        nameTextController.text,
+                                        emailTextController.text,
+                                        passwordTextController.text,
+                                        confirmPasswordTextController.text,
+                                      ),
+                                    );
+                                  },
+                                  text: 'Sign Up',
+                                );
+                              },
                             ),
                             const SizedBox(height: 20),
                             // "Already have an account?" Text

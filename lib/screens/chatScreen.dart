@@ -22,21 +22,27 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    Color iconBc = Theme.of(context).colorScheme.onPrimary;
+    Color appbarColor = Theme.of(context).colorScheme.primary;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           "💬 Messages",
-          style: GoogleFonts.poppins(fontSize: 22, color: Colors.black),
+          style: GoogleFonts.poppins(
+            fontSize: 22,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: app_bc,
+        backgroundColor: appbarColor,
         elevation: 4,
       ),
       body: Padding(
         padding: EdgeInsets.all(size.width * 0.04),
         child: _buildUserList(),
       ),
-      backgroundColor: bc,
+      backgroundColor: iconBc,
     );
   }
 

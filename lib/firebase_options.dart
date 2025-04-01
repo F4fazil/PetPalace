@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -50,19 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBhXGbBPld9rzqbfCN-klv-5h-rB_y06AM',
-    appId: '1:85631613025:android:ad4a9d594a220cace81220',
-    messagingSenderId: '85631613025',
-    projectId: 'propertypall',
-    storageBucket: 'propertypall.appspot.com',
+    apiKey: 'AIzaSyCNCYk8ek3PRKUF9nkPjS7zsN0GyvR6YNc',
+    appId: '1:530056062653:android:b4cfb38f9b2459528539d4',
+    messagingSenderId: '530056062653',
+    projectId: 'petpalace-b5aa9',
+    storageBucket: 'petpalace-b5aa9.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDjLWSlRXd0tV773VZu2TGQ5Vazx4gbdU4',
-    appId: '1:85631613025:ios:39a7b353ff8d7ac6e81220',
-    messagingSenderId: '85631613025',
-    projectId: 'propertypall',
-    storageBucket: 'propertypall.appspot.com',
+    apiKey: 'AIzaSyBmzLEWA-GzdQIdDCsYQ_TGq7linyqQMco',
+    appId: '1:530056062653:ios:e6639c4523ed19428539d4',
+    messagingSenderId: '530056062653',
+    projectId: 'petpalace-b5aa9',
+    storageBucket: 'petpalace-b5aa9.firebasestorage.app',
     iosBundleId: 'com.example.petpalace',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAoMCtQZxQgjR0yQl7_CXcoDZzIV1JC0lU',
+    appId: '1:530056062653:web:03596a065f5361ff8539d4',
+    messagingSenderId: '530056062653',
+    projectId: 'petpalace-b5aa9',
+    authDomain: 'petpalace-b5aa9.firebaseapp.com',
+    storageBucket: 'petpalace-b5aa9.firebasestorage.app',
+    measurementId: 'G-5155TGN20V',
+  );
+
 }

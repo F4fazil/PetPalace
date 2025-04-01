@@ -63,6 +63,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           // Wrap the Image.asset with Expanded
                           child: Image.asset(
                             contents[i].image,
+                            colorBlendMode: BlendMode.color,
+
                             // Remove fixed height here, let it be flexible
                           ),
                         ),

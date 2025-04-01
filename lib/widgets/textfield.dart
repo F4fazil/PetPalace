@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -42,7 +43,7 @@ class _MyTextFieldState extends State<MyTextField> {
                   ? IconButton(
                     icon: Icon(
                       _isObscured ? Icons.visibility : Icons.visibility_off,
-                      color: Theme.of(context).colorScheme.primaryContainer,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     onPressed: () {
                       setState(() {
@@ -67,6 +68,7 @@ class _MyTextFieldState extends State<MyTextField> {
           fillColor: Theme.of(context).colorScheme.onPrimary,
           filled: true,
           hintText: widget.hintText,
+          hintStyle: GoogleFonts.quicksand(),
         ),
       ),
     );

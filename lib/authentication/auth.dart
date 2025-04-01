@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:petpalace/OnboardScreens/OnBoardScreen.dart';
-import 'package:petpalace/authentication/startScreen.dart';
 import 'package:petpalace/screens/feature_screens/homeScreen.dart';
 
 class AuthPage extends StatelessWidget {

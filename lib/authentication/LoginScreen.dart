@@ -1,11 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:petpalace/screens/homepage.dart';
+import 'package:petpalace/widgets/lottieLoading.dart';
 import '../constant/constant.dart';
-import '../widgets/Osm_dailoge.dart';
 import '../widgets/login_signup_btn.dart';
 import '../widgets/textfield.dart';
 import 'Forget_Password.dart';
 import 'SignupPage.dart';
+import 'authBloc/authBloc.dart';
+import 'authState/authState.dart';
+import 'events/authEvent.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,32 +20,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final email = TextEditingController();
-  final password = TextEditingController();
-
-  // Sign In Function
-  Future<void> signIn() async {
-    try {
-      if (email.text.isEmpty || password.text.isEmpty) {
-        OsmDailogue(context).showSnackBar("Please fill all fields");
-        return;
-      }
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email.text.trim(), // Trim whitespace
-        password: password.text.trim(),
-      );
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(
-        // ignore: use_build_context_synchronously
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.code)));
-    } catch (e) {
-      ScaffoldMessenger.of(
-        // ignore: use_build_context_synchronously
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Try again")));
-    }
-  }
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           child: Column(
             children: [
-              // Logo Header Image
               Container(
                 height: MediaQuery.of(context).size.height * 0.33,
                 decoration: const BoxDecoration(
@@ -63,13 +43,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     bottomLeft: Radius.circular(100),
                     bottomRight: Radius.circular(10),
                   ),
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: AssetImage("assets/splash.jpg"),
-                  ),
+                ),
+                child: Image.asset(
+                  fit: BoxFit.fitHeight,
+                  "assets/splash.png",
+                  color: Theme.of(context).colorScheme.primary,
+                  colorBlendMode: BlendMode.color,
                 ),
               ),
-              // Form Section
               Expanded(
                 child: Container(
                   width: MediaQuery.of(context).size.width,
@@ -83,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 20),
                           Text(
                             "Login",
-                            style: TextStyle(
+                            style: GoogleFonts.quicksand(
                               color:
                                   Theme.of(
                                     context,
@@ -142,23 +123,46 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      // Button and Text at the Bottom
                       Positioned(
-                        bottom: 40, // Position 40px from the bottom
+                        bottom: 40,
                         left: 0,
                         right: 0,
                         child: Column(
                           children: [
-                            // Login Button
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              child: MyButton(
-                                text: "Login",
-                                onPressed: () => signIn(),
-                              ),
+                            BlocConsumer<Authbloc, Authstate>(
+                              listener: (context, state) {
+                                if (state is Authenticated) {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const HomeScreen(),
+                                    ),
+                                  );
+                                } else if (state is AuthError) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(state.error)),
+                                  );
+                                }
+                              },
+                              builder: (context, state) {
+                                if (state is AuthLoading) {
+                                  return const Lottieloading();
+                                }
+                                return MyButton(
+                                  onPressed: () {
+                                    context.read<Authbloc>().add(
+                                      SignInRequested(
+                                        email.text,
+                                        password.text,
+                                      ),
+                                    );
+                                    print("Signin reached");
+                                  },
+                                  text: 'Sign In',
+                                );
+                              },
                             ),
                             const SizedBox(height: 20),
-                            // "Does not have an account?" Text
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

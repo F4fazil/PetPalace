@@ -36,8 +36,9 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Color iconBc = Theme.of(context).colorScheme.onPrimary;
     return Scaffold(
-      backgroundColor: bc,
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       resizeToAvoidBottomInset: false,
       body: SlidingUpPanel(
         minHeight: 0, // Minimum height when panel is collapsed
@@ -59,11 +60,14 @@ class _MainScreenState extends State<MainScreen> {
           ), // Add margin from left, right, and bottom
           height: 70, // Set a fixed height to make the container consistent
           decoration: BoxDecoration(
-            color: bc, // Background color for the navigation bar
+            color:
+                Theme.of(context)
+                    .colorScheme
+                    .primary, // Background color for the navigation bar
             borderRadius: BorderRadius.circular(30), // Make it circular
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Theme.of(context).colorScheme.onPrimary,
                 spreadRadius: 2,
                 blurRadius: 8,
                 offset: const Offset(0, 4), // Shadow effect
@@ -75,35 +79,39 @@ class _MainScreenState extends State<MainScreen> {
               30,
             ), // Ensures the BottomNavigationBar is also rounded
             child: BottomNavigationBar(
-              backgroundColor: app_bc,
+              backgroundColor: iconBc,
+              showSelectedLabels: false, // Hide selected labels
+              showUnselectedLabels: false, // Hide unselected labels
               items: <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                  backgroundColor: app_bc,
+                  backgroundColor: iconBc,
                   icon: const Icon(Icons.pentagon_outlined),
-                  label: '▲',
+                  activeIcon: const Icon(Icons.pentagon),
+                  label: "", // Empty string instead of null
                 ),
                 BottomNavigationBarItem(
                   icon: chatIconWithIndicator(),
-                  backgroundColor: app_bc,
-                  label: '▲',
+                  activeIcon: const Icon(Icons.chat),
+                  label: "", // Empty string instead of null
+                  backgroundColor: iconBc,
                 ),
                 BottomNavigationBarItem(
-                  icon: const Icon(Icons.favorite_sharp),
-                  backgroundColor: app_bc,
-                  label: '▲',
+                  icon: const Icon(Icons.favorite_border_outlined),
+                  activeIcon: const Icon(Icons.favorite_sharp),
+                  label: "", // Empty string instead of null
+                  backgroundColor: iconBc,
                 ),
                 BottomNavigationBarItem(
-                  backgroundColor: app_bc,
-                  icon: const Icon(Icons.person),
-                  label: '▲',
+                  backgroundColor: iconBc,
+                  icon: const Icon(Icons.person_2_outlined),
+                  activeIcon: const Icon(Icons.person),
+                  label: "", // Empty string instead of null
                 ),
               ],
               currentIndex: _selectedIndex,
               selectedItemColor: Colors.white,
               unselectedItemColor: Colors.black54,
               iconSize: 30.0,
-              selectedFontSize: 14.0,
-              unselectedFontSize: 16.0,
               onTap: _onItemTapped,
             ),
           ),
